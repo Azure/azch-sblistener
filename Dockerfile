@@ -24,4 +24,4 @@ ENV TEAMNAME=
 ENV SERVICEBUSCONNSTRING=
 ENV SERVICEBUSQUEUENAME=
 
-ENTRYPOINT ["dotnet", "sbqueuelistenerack.dll"]
+ENTRYPOINT ["dotnet", "sblistener.dll"]
