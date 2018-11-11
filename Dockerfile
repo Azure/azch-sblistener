@@ -12,7 +12,7 @@ RUN dotnet publish --output /app/ --configuration Release
 # Build runtime image
 FROM microsoft/dotnet:2.1-runtime-alpine
 WORKDIR /app
-COPY --from=builder /app .
+COPY --from=build-env /app .
 
 # Define environment variables
 # Application Insights
