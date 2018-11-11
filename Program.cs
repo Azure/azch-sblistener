@@ -71,10 +71,6 @@ namespace sblistener
             }
 
             AppInsightsKey = Environment.GetEnvironmentVariable("APPINSIGHTS_KEY");
-            if (string.IsNullOrEmpty(AppInsightsKey))
-            {
-                throw new ArgumentNullException("APPINSIGHTS_KEY is empty");
-            }
 
             TeamName = Environment.GetEnvironmentVariable("TEAMNAME");
             if (string.IsNullOrEmpty(TeamName))
@@ -91,7 +87,10 @@ namespace sblistener
 
         static void InitAppInsights()
         {
-            telemetryClient = new TelemetryClient(new TelemetryConfiguration(AppInsightsKey));
+            if (!string.IsNullOrEmpty(AppInsightsKey))
+            {
+                telemetryClient = new TelemetryClient(new TelemetryConfiguration(AppInsightsKey));
+            }
             challengeTelemetryClient = new TelemetryClient(new TelemetryConfiguration(ChallengeAppInsightsKey));
         }
 
@@ -157,7 +156,8 @@ namespace sblistener
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                telemetryClient.TrackException(ex);
+                if(telemetryClient!=null) 
+                    telemetryClient.TrackException(ex);
             }
         }
         static void trackEvent(EventTelemetry eventTelemetry)
@@ -165,7 +165,9 @@ namespace sblistener
             // Due to a bug in app insights, each telemetry client should send a different event instance otherwise it will be sent to the same app. 
             var eventTelemetryCopy = (EventTelemetry) eventTelemetry.DeepClone();
 
-            telemetryClient.TrackEvent(eventTelemetry);
+            if(telemetryClient!=null) 
+                    telemetryClient.TrackEvent(eventTelemetry);
+
             challengeTelemetryClient.TrackEvent(eventTelemetryCopy);
 
         }
@@ -184,7 +186,9 @@ namespace sblistener
             exceptionTelemetry.Properties.Add("Entity Path", context.EntityPath);
             exceptionTelemetry.Properties.Add("Executing Action", context.Action);
 
-            telemetryClient.TrackException(exceptionTelemetry);
+            if(telemetryClient!=null) 
+                    telemetryClient.TrackException(exceptionTelemetry);
+                    
             return Task.CompletedTask;
         }
 
