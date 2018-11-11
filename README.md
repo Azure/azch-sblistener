@@ -1,3 +1,32 @@
+# Service Bus Queue Listener
+
+A containerised .NET Core event listener that listens to Azure Service Bus Queues and passes requests on to an internal endpoint
+
+[![Build Status](https://dev.azure.com/theazurechallenge/Kubernetes/_apis/build/status/Code/Azure.azch-sblistener)](https://dev.azure.com/theazurechallenge/Kubernetes/_build/latest?definitionId=14)
+
+## Environment Variables
+
+The following environment variables need to be passed to the container:
+
+### Logging
+
+```
+ENV TEAMNAME=[YourTeamName]
+ENV APPINSIGHTS_KEY=[YourCustomApplicationInsightsKey] # Optional, create your own App Insights resource
+```
+
+### Service Bus
+
+```
+ENV SERVICEBUSCONNSTRING="Endpoint=sb://[yourservicebusname].servicebus.windows.net/;SharedAccessKeyName=[keyname];SharedAccessKey=[key]"
+ENV SERVICEBUSQUEUENAME="[YourServiceBusQueueName]"
+```
+
+### For Process Endpoint
+
+```
+ENV PROCESSENDPOINT=http://fulfillorder.[namespace].svc.cluster.local:8080/v1/order/
+```
 
 # Contributing
 
