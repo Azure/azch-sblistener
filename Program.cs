@@ -125,6 +125,9 @@ namespace sblistener
                 eventTelemetry.Properties.Add("service", "servicebuslistener");
                 eventTelemetry.Properties.Add("orderId", orderId);
 
+
+                Console.WriteLine($"Order received {orderId}. Attempting to send request to process endpoint.");
+
                 var result = await SendRequest(orderMessage);
 
                 if (result)
@@ -138,6 +141,7 @@ namespace sblistener
                 }
                 else
                 {
+                    Console.WriteLine($"Couldn't send to process endpoint");
                     eventTelemetry.Properties.Add("status", "failed to send to fulfillment service");
                     // This will make the message available again for processing
                     await queueClient.AbandonAsync(message.SystemProperties.LockToken);
@@ -189,6 +193,8 @@ namespace sblistener
         static async Task<bool> SendRequest(string message)
         {
             var result = await httpClient.PostAsync(ProcessEndpoint, new StringContent(message, Encoding.UTF8, "application/json"));
+            if(!result.IsSuccessStatusCode)
+                Console.WriteLine($"HTTP Request to {ProcessEndpoint} failed: {result.StatusCode} {result.ReasonPhrase} {result.Content}");
             return result.IsSuccessStatusCode;
         }
 
