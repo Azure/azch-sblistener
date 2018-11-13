@@ -25,7 +25,7 @@ ENV SERVICEBUSCONNSTRING="Endpoint=sb://[yourservicebusname].servicebus.windows.
 ### For Process Endpoint
 
 ```
-ENV PROCESSENDPOINT=http://fulfillorder.[namespace].svc.cluster.local:8080/v1/order/
+ENV PROCESSENDPOINT=http://fulfillorder.[namespace].svc.cluster.local/v1/order/
 ```
 
 # Contributing

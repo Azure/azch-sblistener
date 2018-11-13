@@ -126,7 +126,7 @@ namespace sblistener
                 eventTelemetry.Properties.Add("orderId", orderId);
 
 
-                Console.WriteLine($"Order received {orderId}. Attempting to send request to process endpoint.");
+                Console.WriteLine($"Order received {orderId}. Attempting to send request to process endpoint: {ProcessEndpoint}");
 
                 var result = await SendRequest(orderMessage);
 
