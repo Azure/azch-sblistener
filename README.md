@@ -19,8 +19,7 @@ ENV CHALLENGEAPPINSIGHTS_KEY=[Challenge Application Insights Key] # Override, if
 ### Service Bus
 
 ```
-ENV SERVICEBUSCONNSTRING="Endpoint=sb://[yourservicebusname].servicebus.windows.net/;SharedAccessKeyName=[keyname];SharedAccessKey=[key]"
-ENV SERVICEBUSQUEUENAME="[YourServiceBusQueueName]"
+ENV SERVICEBUSCONNSTRING="Endpoint=sb://[yourservicebusname].servicebus.windows.net/;SharedAccessKeyName=[keyname];SharedAccessKey=[key];EntityPath=[queuename]"
 ```
 
 ### For Process Endpoint

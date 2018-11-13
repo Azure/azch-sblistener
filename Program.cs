@@ -15,7 +15,6 @@ namespace sblistener
         // Connection String for the namespace can be obtained from the Azure portal under the 
         // 'Shared Access policies' section.
         private static string ServiceBusConnectionString = "<your_connection_string>";
-        private static string QueueName = "<your_queue_name>";
         private static string ChallengeAppInsightsKey;
         private static string AppInsightsKey;
         private static string TeamName;
@@ -35,7 +34,8 @@ namespace sblistener
             InitEnvVars();
             InitAppInsights();
 
-            queueClient = new QueueClient(ServiceBusConnectionString, QueueName);
+            var csb = new ServiceBusConnectionStringBuilder(ServiceBusConnectionString);
+            queueClient = new QueueClient(csb);
 
             // Register QueueClient's MessageHandler and receive messages in a loop
             RegisterOnMessageHandlerAndReceiveMessages();
@@ -56,12 +56,6 @@ namespace sblistener
             if (string.IsNullOrEmpty(ServiceBusConnectionString))
             {
                 throw new ArgumentNullException("SERVICEBUSCONNSTRING is empty");
-            }
-
-            QueueName = Environment.GetEnvironmentVariable("SERVICEBUSQUEUENAME");
-            if (string.IsNullOrEmpty(QueueName))
-            {
-                throw new ArgumentNullException("SERVICEBUSQUEUENAME is empty");
             }
 
             ChallengeAppInsightsKey = Environment.GetEnvironmentVariable("CHALLENGEAPPINSIGHTS_KEY");
