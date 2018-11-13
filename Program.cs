@@ -132,7 +132,7 @@ namespace sblistener
 
                 if (result)
                 {
-                    Console.WriteLine($"Send order to fulfillment {orderId}");
+                    Console.WriteLine($"Sent order to fulfillment {orderId}");
                     eventTelemetry.Properties.Add("status", "sent to fulfillment service");
 
                     // Complete the message so that it is not received again.
