@@ -84,8 +84,11 @@ namespace sblistener
             if (!string.IsNullOrEmpty(AppInsightsKey))
             {
                 telemetryClient = new TelemetryClient(new TelemetryConfiguration(AppInsightsKey));
+                telemetryClient.Context.Cloud.RoleName="eventlistener";
             }
             challengeTelemetryClient = new TelemetryClient(new TelemetryConfiguration(ChallengeAppInsightsKey));
+            challengeTelemetryClient.Context.Cloud.RoleName="eventlistener";
+
         }
 
         static void RegisterOnMessageHandlerAndReceiveMessages()
