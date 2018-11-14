@@ -128,10 +128,7 @@ namespace sblistener
                 var requestTelemetry = new RequestTelemetry();
                 requestTelemetry.Name = $"ServiceBusListener";
                 requestTelemetry.Properties.Add("team", TeamName);
-                requestTelemetry.Properties.Add("sequence", "3");
-                requestTelemetry.Properties.Add("type", "servicebus");
                 requestTelemetry.Properties.Add("service", "servicebuslistener");
-                requestTelemetry.Properties.Add("orderId", orderId);
                 requestTelemetry.Timestamp = DateTime.Now;
 
                 Console.WriteLine($"Order received {orderId}. Attempting to send request to process endpoint: {ProcessEndpoint}");
