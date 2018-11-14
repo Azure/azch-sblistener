@@ -125,6 +125,14 @@ namespace sblistener
                 eventTelemetry.Properties.Add("service", "servicebuslistener");
                 eventTelemetry.Properties.Add("orderId", orderId);
 
+                var requestTelemetry = new RequestTelemetry();
+                requestTelemetry.Name = $"ServiceBusListener";
+                requestTelemetry.Properties.Add("team", TeamName);
+                requestTelemetry.Properties.Add("sequence", "3");
+                requestTelemetry.Properties.Add("type", "servicebus");
+                requestTelemetry.Properties.Add("service", "servicebuslistener");
+                requestTelemetry.Properties.Add("orderId", orderId);
+                requestTelemetry.Timestamp = DateTime.Now;
 
                 Console.WriteLine($"Order received {orderId}. Attempting to send request to process endpoint: {ProcessEndpoint}");
 
@@ -134,6 +142,7 @@ namespace sblistener
                 {
                     Console.WriteLine($"Sent order to fulfillment {orderId}");
                     eventTelemetry.Properties.Add("status", "sent to fulfillment service");
+                    requestTelemetry.Success = true;
 
                     // Complete the message so that it is not received again.
                     // This can be done only if the queueClient is created in ReceiveMode.PeekLock mode (which is default).
@@ -143,10 +152,14 @@ namespace sblistener
                 {
                     Console.WriteLine($"Couldn't send to process endpoint");
                     eventTelemetry.Properties.Add("status", "failed to send to fulfillment service");
+                    requestTelemetry.Success = false;
+
                     // This will make the message available again for processing
                     await queueClient.AbandonAsync(message.SystemProperties.LockToken);
                 }
                 trackEvent(eventTelemetry);
+                trackRequest(requestTelemetry);
+
                 // Note: Use the cancellationToken passed as necessary to determine if the queueClient has already been closed.
                 // If queueClient has already been Closed, you may chose to not call CompleteAsync() or AbandonAsync() etc. calls 
                 // to avoid unnecessary exceptions.
@@ -154,20 +167,35 @@ namespace sblistener
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                if(telemetryClient!=null) 
+                if (telemetryClient != null)
                     telemetryClient.TrackException(ex);
             }
         }
         static void trackEvent(EventTelemetry eventTelemetry)
         {
             // Due to a bug in app insights, each telemetry client should send a different event instance otherwise it will be sent to the same app. 
-            var eventTelemetryCopy = (EventTelemetry) eventTelemetry.DeepClone();
+            var eventTelemetryCopy = (EventTelemetry)eventTelemetry.DeepClone();
 
-            if(telemetryClient!=null) 
-                    telemetryClient.TrackEvent(eventTelemetry);
+            if (telemetryClient != null)
+                telemetryClient.TrackEvent(eventTelemetry);
 
             challengeTelemetryClient.TrackEvent(eventTelemetryCopy);
 
+        }
+
+        static void trackRequest(RequestTelemetry requestTelemetry)
+        {
+          // Track the duration
+          if(requestTelemetry.Timestamp!=null)
+            requestTelemetry.Duration = DateTime.Now - requestTelemetry.Timestamp;
+
+            // Due to a bug in app insights, each telemetry client should send a different event instance otherwise it will be sent to the same app. 
+            var requestTelemetryCopy = (RequestTelemetry)requestTelemetry.DeepClone();
+
+            if (telemetryClient != null)
+                telemetryClient.TrackRequest(requestTelemetry);
+
+            challengeTelemetryClient.TrackRequest(requestTelemetryCopy);
         }
         static Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
         {
@@ -184,16 +212,16 @@ namespace sblistener
             exceptionTelemetry.Properties.Add("Entity Path", context.EntityPath);
             exceptionTelemetry.Properties.Add("Executing Action", context.Action);
 
-            if(telemetryClient!=null) 
-                    telemetryClient.TrackException(exceptionTelemetry);
-                    
+            if (telemetryClient != null)
+                telemetryClient.TrackException(exceptionTelemetry);
+
             return Task.CompletedTask;
         }
 
         static async Task<bool> SendRequest(string message)
         {
             var result = await httpClient.PostAsync(ProcessEndpoint, new StringContent(message, Encoding.UTF8, "application/json"));
-            if(!result.IsSuccessStatusCode)
+            if (!result.IsSuccessStatusCode)
                 Console.WriteLine($"HTTP Request to {ProcessEndpoint} failed: {result.StatusCode} {result.ReasonPhrase} {result.Content}");
             return result.IsSuccessStatusCode;
         }
